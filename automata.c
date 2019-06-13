@@ -10,7 +10,7 @@ int base = 5000000;
 lista etiquetas;
 lista lexemas;
 
-char* o;
+char o[300000]; // tamaño máximo del programa
 
 void carga_automata(){
 	for(int i = 0;i<40;i++){
@@ -651,7 +651,7 @@ int divide_lexemas(FILE *f) {
 		while(t != NULL) {
 			par p = valida_palabra(t);
 			if(p == NULL){
-				printf("Error de Sintaxis\n");
+				printf("Error de Sintaxis\n Línea %d\n", linea);
 				return -1;
 			}
 			if(p->valor == 6) {
@@ -679,46 +679,196 @@ par busca_etiqueta(char *str) {
 		if (ip->cadena == str) return ip;
 		i = i->siguiente;
 	}
+	printf("etiqueta %s no econtrada\n", str);
 	return NULL;
+}
+
+void to_bin(int n, char buf[]) {
+	int i = strlen(buf)-1;
+	for(i; i >= 0; i --) {
+		int r = n % 2;
+		n /= 2;
+		buf[i] = '0'+r;
+	}
+	printf("%s\n", buf);
+}
+
+char* codifica_inst_imm(char *str) {
+	char *buf = "";
+	if(!strcmp(str, "addi")) buf = "000001";
+	else if(!strcmp(str, "subi")) buf = "000010";
+	else if(!strcmp(str, "andi")) buf = "000011";
+	else if(!strcmp(str, "ori")) buf = "000100";
+	else return NULL;
+	char *c = malloc(sizeof(char)*7);
+	strcpy(c, buf);
+	return c;
+}
+
+char* codifica_reg(char *str) {
+	char buf[] = "00000";
+	printf("%s reg_num: %d\n", str+1, atoi(str+1));
+	to_bin(atoi(str+1), buf);
+	char *c = malloc(sizeof(char)*6);
+	strcpy(c, buf);
+	return c;
+}
+
+char* codifica_imm(char *str) {
+	char buf[] = "0000000000000000";
+	int reg_num = atoi(str);
+	to_bin(reg_num, buf);
+	char *c = malloc(sizeof(char)*17);
+	strcpy(c, buf);
+	return c;
+}
+
+// No estoy seguro de cómo se tiene que traduciar la parte de data.
+nodo asm_data_tag(nodo i) {
+	return i;
+}
+
+nodo asm_imm(nodo nop) {
+	char linea[100] = "";
+	if(nop == NULL) {
+		printf("operación inmediata vacía\n");
+		return NULL;
+	}
+	par por = (par) (nop -> elemento);
+	if(por -> valor != 2) {
+		printf("primer término no es una operación\n");
+		return NULL;
+	}
+	char *op = codifica_inst_imm(por->cadena);
+	if(op == NULL) {
+		printf("operador inmediato inválido\n");
+		return NULL;
+	}
+	strcat(linea, op);
+
+	nodo nrs = nop -> siguiente;
+	if(nrs == NULL) {
+		printf("primer operando de inmediata vacía\n");
+		return NULL;
+	}
+	par prs = (par) (nrs -> elemento);
+	if(prs -> valor != 7) {
+		printf("primer operando de inmediata no es registro\n");
+		return NULL;
+	}
+	char *rs = codifica_reg(prs->cadena);
+	strcat(linea, rs);
+
+	nodo nrd = nrs -> siguiente;
+	if(nrd == NULL) {
+		printf("segundo operando de inmediata vacía\n");
+		return NULL;
+	}
+	par prd = (par) (nrd -> elemento);
+	if(prd -> valor != 7) {
+		printf("segundo operando de inmediata no es registro\n");
+		return NULL;
+	}
+	char *rd = codifica_reg(prd->cadena);
+	strcat(linea, rd);
+
+	nodo nimm = nrd -> siguiente;
+	if(nimm == NULL) {
+		printf("inmediato de inmediata vacío\n");
+		return NULL;
+	}
+	par pimm = (par) (nimm -> elemento);
+	if(pimm -> valor != 3) {
+		printf("tercer operando de inmediata no es inmediato\n");
+		return NULL;
+	}
+	char *imm = codifica_imm(pimm->cadena);
+	strcat(linea, imm);
+	
+	strcat(o, linea);
+	return nimm;
+}
+
+nodo asm_jump(nodo i) {
+	return NULL;
+}
+
+nodo asm_reg(nodo i) {
+	return NULL;
+}
+
+nodo asm_inst(nodo i) {
+	par ip = (par) (i -> elemento);
+	char *cod = ip->cadena;
+	nodo r;
+	if(cod[strlen(cod)-1] == 'i') {
+		printf("operador inmediato encontrado\n");
+		r = asm_imm(i);
+	}
+	else if(cod[0] == 'b' || cod[0] == 'j'){
+		printf("operador de salto encontrado\n");
+		r = asm_jump(i);
+	}
+	else {
+		printf("operador de registros encontrado\n");
+		r = asm_imm(i);
+	};
+	return r;
 }
 
 nodo procesa_data(nodo i) {
 	par ip = (par) (i -> elemento);
-	if((ip->valor) != 5 || (ip -> cadena) != ".data") return NULL;
+	if((ip->valor) != 5 || strcmp(".data", ip->cadena)) {
+		printf("no hay sección de data\n");
+		return NULL;
+	}
 	i = i->siguiente;
 	while(i != NULL) {
 		par ip = (par) (i -> elemento);
 		switch (ip->valor) {
 		case 5:
-			if(ip -> cadena == ".text") return i;
+			if(!strcmp(".text", ip->cadena)) return i;
 		case 6:
 			i = asm_data_tag(i);
 			break;
 		default:
+			printf("data: inicio inválido de línea\n");
 			return NULL;
 		}
-		if(i == NULL) return NULL;
+		if(i == NULL) {
+			printf("data: problemas al intentar codificar etiquetas\n");
+			return NULL;
+		}
 		i = i->siguiente;
 	}
 	return NULL;
 }
 
+
+
 int procesa_text(nodo i) {
 	par ip = (par) (i -> elemento);
-	if((ip->valor) != 5 || (ip -> cadena) != ".text") return NULL;
+	if((ip->valor) != 5 || strcmp(".text", ip->cadena)) {
+		printf("no hay sección de text\n");
+		return -1;
+	}
 	i = i->siguiente;
 	while(i != NULL) {
 		par ip = (par) (i -> elemento);
 		switch (ip -> valor) {
 		case 6:
-			i = asm_text_tag(i);
 			break;
 		case 2:
 			i = asm_inst(i);
-		default:
 			break;
+		default:
+			printf("text: inicio inválido de línea\n");
+			return -1;
 		}
-		if(i == NULL) return -1;
+		if(i == NULL) {
+			printf("text: problemas al intentar codificar etiquetas\n");
+			return -1;
+		}
 		i = i->siguiente;
 	}
 	return 0;
@@ -726,9 +876,17 @@ int procesa_text(nodo i) {
 
 int procesa_inst(){
 	nodo i = lexemas -> cabeza;
-	if(i == NULL) return -1;
+	if(i == NULL) {
+		printf("no hay código\n");
+		return -1;
+	}
+	
 	i = procesa_data(i);
-	if(i == NULL) return -1;
+	if(i == NULL) {
+		printf("problemas al intentar codificar la sección de data\n");
+		return -1;
+	}
+
 	return procesa_text(i);
 }
 
@@ -738,11 +896,15 @@ int main(int argc, char** argv){
 	f = fopen(argv[1],"r");
 	lexemas = crea_lista();
 	etiquetas = crea_lista();
-	o = "";
+	//o = "";
 
+	//char c[] = "00000";
+	//to_bin(1, 6, buf);
+	//printf("%s\n", buf);
 	if(divide_lexemas(f) == -1) return -1;
+	printf("número de lexemas %d\n", lexemas -> longitud);
 
 	if(procesa_inst() == -1) return -1;
 	
-	printf("%s", o);
+	printf("código final: \n %s\n", o);
 }

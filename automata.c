@@ -10,6 +10,8 @@ int base = 5000000;
 lista etiquetas;
 lista lexemas;
 
+char* o;
+
 void carga_automata(){
 	for(int i = 0;i<40;i++){
 		for(int j = 0;j<149;j++){
@@ -670,13 +672,77 @@ int divide_lexemas(FILE *f) {
 	return 0;
 }
 
+par busca_etiqueta(char *str) {
+	nodo i = etiquetas -> cabeza;
+	while(i != NULL) {
+		par ip = (par)(i->elemento);
+		if (ip->cadena == str) return ip;
+		i = i->siguiente;
+	}
+	return NULL;
+}
+
+nodo procesa_data(nodo i) {
+	par ip = (par) (i -> elemento);
+	if((ip->valor) != 5 || (ip -> cadena) != ".data") return NULL;
+	i = i->siguiente;
+	while(i != NULL) {
+		par ip = (par) (i -> elemento);
+		switch (ip->valor) {
+		case 5:
+			if(ip -> cadena == ".text") return i;
+		case 6:
+			i = asm_data_tag(i);
+			break;
+		default:
+			return NULL;
+		}
+		if(i == NULL) return NULL;
+		i = i->siguiente;
+	}
+	return NULL;
+}
+
+int procesa_text(nodo i) {
+	par ip = (par) (i -> elemento);
+	if((ip->valor) != 5 || (ip -> cadena) != ".text") return NULL;
+	i = i->siguiente;
+	while(i != NULL) {
+		par ip = (par) (i -> elemento);
+		switch (ip -> valor) {
+		case 6:
+			i = asm_text_tag(i);
+			break;
+		case 2:
+			i = asm_inst(i);
+		default:
+			break;
+		}
+		if(i == NULL) return -1;
+		i = i->siguiente;
+	}
+	return 0;
+}
+
+int procesa_inst(){
+	nodo i = lexemas -> cabeza;
+	if(i == NULL) return -1;
+	i = procesa_data(i);
+	if(i == NULL) return -1;
+	return procesa_text(i);
+}
+
 int main(int argc, char** argv){
 	carga_automata();
 	FILE *f;
 	f = fopen(argv[1],"r");
-	//int total = atoi(argv[1]);
 	lexemas = crea_lista();
 	etiquetas = crea_lista();
-	divide_lexemas(f);
-	return 0;
+	o = "";
+
+	if(divide_lexemas(f) == -1) return -1;
+
+	if(procesa_inst() == -1) return -1;
+	
+	printf("%s", o);
 }

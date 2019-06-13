@@ -5,6 +5,11 @@
 
 int delta[40][150];
 
+int base = 5000000;
+
+lista etiquetas;
+lista lexemas;
+
 void carga_automata(){
 	for(int i = 0;i<40;i++){
 		for(int j = 0;j<149;j++){
@@ -599,7 +604,7 @@ void carga_automata(){
 	delta[37]['z'] = 33;
 	delta[16][149] = 1;//etiqueta
 	delta[17][149] = 1;//etiqueta
-	delta[18][149] = 2;//etiqueta //instruccion
+	delta[18][149] = 2;//instruccion
 	delta[19][149] = 2;//instruccion
 	delta[20][149] = 1;//etiqueta
 	delta[21][149] = 1;//etiqueta
@@ -634,22 +639,44 @@ par valida_palabra(char* palabra){
 	return p;
 }
 
+int divide_lexemas(FILE *f) {
+	char *c = malloc(sizeof(char)*500);
+	int linea = 0;
+	while(fgets(c,500,f) != NULL){
+		linea++;
+		char *t = malloc(sizeof(char)*500);
+		t = strtok(c, " 	\n\0");
+		while(t != NULL) {
+			par p = valida_palabra(t);
+			if(p == NULL){
+				printf("Error de Sintaxis\n");
+				return -1;
+			}
+			if(p->valor == 6) {
+				par q = malloc(sizeof(par));
+				char *c1 = malloc(sizeof(char)*500);;
+				strncpy(c1, p->cadena, strlen(p->cadena)-1);
+				q->cadena = c1;
+				q->valor = base+(linea*4);
+				agrega_fin(q, etiquetas);
+				printf("nueva etiqueta %s en %d\n", q->cadena, q-> valor);
+			}
+			printf("%s %d\n",p->cadena,p->valor);
+
+			agrega_fin(p,lexemas);
+			t = strtok (NULL, " 	\n\0");
+		}
+	}
+	return 0;
+}
+
 int main(int argc, char** argv){
 	carga_automata();
 	FILE *f;
 	f = fopen(argv[1],"r");
-	int total = atoi(argv[1]);
-	char *c = malloc(sizeof(char)*500);
-	//for(int i = 0; i<total; i++){
-	while(fscanf(f, "%s",c) != EOF){
-		par p = valida_palabra(c);
-		if(p == NULL){
-			printf("Error de Sintaxis\n");
-			return -1;
-		}
-		
-		printf("%s %d\n",p->cadena,p->valor);
-			
-	}
+	//int total = atoi(argv[1]);
+	lexemas = crea_lista();
+	etiquetas = crea_lista();
+	divide_lexemas(f);
 	return 0;
 }

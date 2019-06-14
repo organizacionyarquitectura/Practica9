@@ -720,6 +720,8 @@ char* codifica_inst_imm(char *str) {
 	else if(!strcmp(str, "sw")) buf = "001000";
 	else if(!strcmp(str, "sh")) buf = "001001";
 	else if(!strcmp(str, "sb")) buf = "001010";
+	else if(!strcmp(str, "j")) buf = "001011";
+	else if(!strcmp(str, "jr")) buf = "00110";
 	else return NULL;
 	char *c = malloc(sizeof(char)*7);
 	strcpy(c, buf);
@@ -878,11 +880,47 @@ nodo asm_ls(nodo nop){
 	strcat(linea, "\n");
 	strcat(o, linea);
 	return nd;
-	
 }
 
 nodo asm_jump(nodo nop) {
-	return NULL;
+	char linea[100] = "";
+	if(nop == NULL) {
+		printf("operación salto vacía\n");
+		return NULL;
+	}
+	par por = (par) (nop -> elemento);
+	if(por -> valor != 2) {
+		printf("primer término no es una operación\n");
+		return NULL;
+	}
+	char *op = codifica_inst_imm(por->cadena);
+	if(op == NULL) {
+		printf("operador salto inválido\n");
+		return NULL;
+	}
+	strcat(linea, op);
+
+	nodo nrs = nop -> siguiente;
+	if(nrs == NULL) {
+		printf("primer operando de salto vacía\n");
+		return NULL;
+	}
+	par prs = (par) (nrs -> elemento);
+	if(prs -> valor == 1) {
+		char *l = codifica_etiqueta(prs -> cadena);
+		strcat(linea, "0000000000");
+		strcat(linea, l);
+	} else if(prs->valor == 7) {
+		char *r = codifica_reg(prs -> cadena);
+		strcat(linea, "000000000000000000000");
+		strcat(linea, r);
+	} else {
+		printf("primer operando de salto no válido\n");
+		return NULL;
+	}
+	strcat(linea, "\n");
+	strcat(o, linea);
+	return nrs;
 }
 
 nodo asm_jump_c(nodo nop) {

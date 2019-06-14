@@ -789,12 +789,75 @@ nodo asm_imm(nodo nop) {
 	return nimm;
 }
 
-nodo asm_jump(nodo i) {
+nodo asm_ls(nodo i){
 	return NULL;
 }
 
-nodo asm_reg(nodo i) {
+nodo asm_jump(nodo nop) {
 	return NULL;
+}
+
+nodo asm_reg(nodo nop) {
+	char linea[100] = "00000";
+	if(nop == NULL) {
+		printf("operación con registros vacía\n");
+		return NULL;
+	}
+	par por = (par) (nop -> elemento);
+	if(por -> valor != 2) {
+		printf("primer término no es una operación\n");
+		return NULL;
+	}
+	char *op = codifica_inst_reg(por->cadena);
+	if(op == NULL) {
+		printf("operador de registros inválido\n");
+		return NULL;
+	}
+	
+
+	nodo nrs = nop -> siguiente;
+	if(nrs == NULL) {
+		printf("primer operando de registros vacía\n");
+		return NULL;
+	}
+	par prs = (par) (nrs -> elemento);
+	if(prs -> valor != 7) {
+		printf("primer operando de registros no es registro\n");
+		return NULL;
+	}
+	char *rs = codifica_reg(prs->cadena);
+	strcat(linea, rs);
+
+	nodo nrt = nrs -> siguiente;
+	if(nrt == NULL) {
+		printf("segundo operando de registros vacío\n");
+		return NULL;
+	}
+	par prt = (par) (nrt -> elemento);
+	if(prt -> valor != 7) {
+		printf("segundo operando de registros no es registro\n");
+		return NULL;
+	}
+	char *rt = codifica_reg(prt->cadena);
+	strcat(linea, rt);
+
+	nodo nrd = nrt -> siguiente;
+	if(nrd == NULL) {
+		printf("tercer operando de registros vacío\n");
+		return NULL;
+	}
+	par prd = (par) (nrd -> elemento);
+	if(prd -> valor != 7) {
+		printf("tercer operando de registros no es registro\n");
+		return NULL;
+	}
+	char *rd = codifica_reg(prd->cadena);
+	strcat(linea, rd);
+
+	strcat(linea, op);
+	
+	strcat(o, linea);
+	return nrd;
 }
 
 nodo asm_inst(nodo i) {
@@ -802,16 +865,18 @@ nodo asm_inst(nodo i) {
 	char *cod = ip->cadena;
 	nodo r;
 	if(cod[strlen(cod)-1] == 'i') {
-		printf("operador inmediato encontrado\n");
+		printf("operador inmediato explícito encontrado\n");
 		r = asm_imm(i);
-	}
-	else if(cod[0] == 'b' || cod[0] == 'j'){
+	} else if(cod[0] == 's' || cod[0] == 'l'){
+		printf("operador inmediato implícito encontrado\n");
+		r = asm_ls(i);
+	} else if(cod[0] == 'b' || cod[0] == 'j'){
 		printf("operador de salto encontrado\n");
 		r = asm_jump(i);
 	}
 	else {
 		printf("operador de registros encontrado\n");
-		r = asm_imm(i);
+		r = asm_reg(i);
 	};
 	return r;
 }

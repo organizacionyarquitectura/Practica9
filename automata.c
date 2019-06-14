@@ -712,6 +712,14 @@ char* codifica_inst_imm(char *str) {
 	else if(!strcmp(str, "subi")) buf = "000010";
 	else if(!strcmp(str, "andi")) buf = "000011";
 	else if(!strcmp(str, "ori")) buf = "000100";
+	else if(!strcmp(str, "beq")) buf = "000101";
+	else if(!strcmp(str, "bgt")) buf = "000110";
+	else if(!strcmp(str, "lw")) buf = "000101";
+	else if(!strcmp(str, "lh")) buf = "000110";
+	else if(!strcmp(str, "lb")) buf = "000111";
+	else if(!strcmp(str, "sw")) buf = "001000";
+	else if(!strcmp(str, "sh")) buf = "001001";
+	else if(!strcmp(str, "sb")) buf = "001010";
 	else return NULL;
 	char *c = malloc(sizeof(char)*7);
 	strcpy(c, buf);
@@ -730,6 +738,17 @@ char* codifica_reg(char *str) {
 char* codifica_imm(char *str) {
 	char buf[] = "0000000000000000";
 	int reg_num = atoi(str);
+	to_bin(reg_num, buf);
+	char *c = malloc(sizeof(char)*17);
+	strcpy(c, buf);
+	return c;
+}
+
+char* codifica_etiqueta(char *etiqueta) {
+	par p = busca_etiqueta(etiqueta);
+	if(p == NULL) return NULL;
+	char buf[] = "0000000000000000";
+	int reg_num = linea - (p -> valor);
 	to_bin(reg_num, buf);
 	char *c = malloc(sizeof(char)*17);
 	strcpy(c, buf);
@@ -803,8 +822,63 @@ nodo asm_imm(nodo nop) {
 	return nimm;
 }
 
-nodo asm_ls(nodo i){
-	return NULL;
+nodo asm_ls(nodo nop){
+	char linea[100] = "";
+	if(nop == NULL) {
+		printf("operación manejo memoria vacía\n");
+		return NULL;
+	}
+	par por = (par) (nop -> elemento);
+	if(por -> valor != 2) {
+		printf("primer término no es una operación\n");
+		return NULL;
+	}
+	char *op = codifica_inst_imm(por->cadena);
+	if(op == NULL) {
+		printf("operador manejo memoria inválido\n");
+		return NULL;
+	}
+	strcat(linea, op);
+
+	nodo nrs = nop -> siguiente;
+	if(nrs == NULL) {
+		printf("primer operando de manejo memoria vacía\n");
+		return NULL;
+	}
+	par prs = (par) (nrs -> elemento);
+	if(prs -> valor != 7) {
+		printf("primer operando de manejo memoria no es registro\n");
+		return NULL;
+	}
+	char *rs = codifica_reg(prs->cadena);
+	strcat(linea, rs);
+
+	nodo nd = nrs -> siguiente;
+	if(nd == NULL) {
+		printf("segundo operando de manejo memoria vacía\n");
+		return NULL;
+	}
+	par pd = (par) (nd -> elemento);
+	if(pd -> valor == 4) {
+		char *aux = strtok(pd->cadena, "()");
+		char *imm = codifica_imm(aux);
+		char *d = codifica_reg(strtok(NULL, "()"));
+		strcat(linea, d);
+		strcat(linea, imm);
+	} else if(pd -> valor == 1) {
+		char *l = codifica_etiqueta(pd->cadena);
+		char *d = codifica_reg("$00");
+		strcat(linea, d);
+		strcat(linea, l);
+	} else {
+		printf("segundo operando de manejo memoria no es direccionamiento\n");
+		return NULL;
+	}
+
+	strcat(linea, "\n");
+	strcat(o, linea);
+	return nd;
+	
 }
 
 nodo asm_jump(nodo nop) {
@@ -996,11 +1070,7 @@ int main(int argc, char** argv){
 	f = fopen(argv[1],"r");
 	lexemas = crea_lista();
 	etiquetas = crea_lista();
-	//o = "";
 
-	//char c[] = "00000";
-	//to_bin(1, 6, buf);
-	//printf("%s\n", buf);
 	if(divide_lexemas(f) == -1) return -1;
 	printf("número de lexemas %d\n", lexemas -> longitud);
 

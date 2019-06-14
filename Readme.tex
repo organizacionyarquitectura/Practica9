@@ -118,88 +118,90 @@
 
 		%2
 		\item {
-			Asigna cuidadosamente los códigos de operación a cada una de las instrucciones. \\
+			Asigna cuidadosamente los códigos de operación a cada una de las instrucciones. 
 			
-			Los siguientes códigos de operación son todos extraídos de la fuente \cite{manual}
 			\begin{enumerate}
-			\item{ \textbf{lw} rs dir\\
-				Su código de operación es 100011  \\
-			}
+				\item{ \textbf{lw} rs dir\\
+					Su código de operación es 000101  \\
+				}
+				
+				\item{ \textbf{lh} rs dir\\
+					Su código de operación es 000110 \\
+				}
+				
+				\item{ \textbf{lb} rs dir\\
+					Su código de operación es 000111  \\
+				}
+				
+				\item{ \textbf{sw} rs dir\\
+					Su código de operación es 001000 \\
+				}
+				
+				\item{ \textbf{sh} rs dir\\
+					Su código de operación es 001001\\
+				}
+				
+				\item{ \textbf{sb} rs dir\\
+					Su código de operación es 001010\\
+				}
+				
+				\item{ \textbf{add} rd rs rt\\
+					Su código de operación es 00000000001\\
+				}
+				
+				\item{ \textbf{addi} rd rs imm\\
+					Su código de operación es 000001\\
+				}
+				
+				\item{ \textbf{sub} rd rs rt\\
+					Su código de operación es 00000000010 \\
+				}
+				
+				\item{ \textbf{subi} rd rs imm\\
+					Su código de operación es 000010 \\
+				}
+				
+				\item{ \textbf{and} rd rs rt\\
+					Su código de operación es 00000000011\\
+				}
+				
+				\item{ \textbf{andi} rd rs imm\\
+					Su código de operación es 000011\\
+				}
+				
+				\item{ \textbf{or} rd rs rt\\
+					Su código de operación es 00000000100\\
+				}
+				
+				\item{ \textbf{ori} rd rs imm\\
+					Su código de operación es 000100\\
+				}
+				
+				\item{ \textbf{beq} rs rt label\\
+					Su código de operación es 000101 \\
+				}
+				
+				\item{ \textbf{bgt} rs rt label\\
+					Su código de operación es 000110\\
+				}
+				
+				\item{ \textbf{j} label\\
+					Su código de operación es 001011\\
+				}
+				
+				\item{ \textbf{jr} rd\\
+					Su código de operación es 00110
+				}
+			\end{enumerate}
 			
-			\item{ \textbf{lh} rs dir\\
-				Su código de operación es 100001 \\
-			}
 			
-			\item{ \textbf{lb} rs dir\\
-				Su código de operación es 100000  \\
-			}
 			
-			\item{ \textbf{sw} rs dir\\
-				Su código de operación es 101011  \\
-			}
-			
-			\item{ \textbf{sh} rs dir\\
-				Su código de operación es 101001\\
-			}
-			
-			\item{ \textbf{sb} rs dir\\
-				Su código de operación es 101000\\
-			}
-			
-			\item{ \textbf{add} rd rs rt\\
-				Su código de operación es 100000\\
-			}
-			
-			\item{ \textbf{addi} rd rs imm\\
-				Su código de operación es 001000\\
-			}
-			
-			\item{ \textbf{sub} rd rs rt\\
-				Su código de operación es 100010 \\
-			}
-			
-			\item{ \textbf{subi} rd rs imm\\
-				Su código de operación es 100011 \\
-			}
-			
-			\item{ \textbf{and} rd rs rt\\
-				Su código de operación es 100100\\ 
-			}
-			
-			\item{ \textbf{andi} rd rs imm\\
-				Su código de operación es 001100\\
-			}
-			
-			\item{ \textbf{or} rd rs rt\\
-				Su código de operación es 100101\\
-			}
-			
-			\item{ \textbf{ori} rd rs imm\\
-				Su código de operación es 001101\\
-			}
-			
-			\item{ \textbf{beq} rs rt label\\
-				Su código de operación es 000100 \\
-			}
-			
-			\item{ \textbf{bgt} rs rt label\\
-				Su código de operación es 000111\\
-			}
-			
-			\item{ \textbf{j} label\\
-				Su código de operación es 000010\\ 
-			}
-			
-			\item{ \textbf{jr} rd\\
-				Su código de operación es 001000
-			}
-		\end{enumerate}
 		}
 		%3
 		\item {
 			Define el tamaño de la memoria y las direcciones de inicio de las secciones de memoria para el área de texto y el área de datos.\\
 			
-			De acuerdo a la documentación de MIPS, los procesadores modernos compatibles con x86 son capaces de direccionar hasta $2^{32}$ bytes de memoria: las direcciones de memoria son de 32 bits de ancho
+			De acuerdo a la documentación de MIPS, los procesadores modernos compatibles con x86 son capaces de direccionar hasta $2^{32}$ bytes de memoria y las direcciones de memoria son de 32 bits de ancho, así que en este caso le daremos un tamaño estándar de 32 de registros, donde los registros guardados serán para los datos y los registros locales para el área de texto.
 		}
 	\end{enumerate}
 
@@ -210,17 +212,27 @@
     \item {
     Una pseudoinstrucción es una instrucción de lenguaje ensamblador sin implementación directa en el hardware, su función es simplificar la programación sin complicar el hardware, por ejemplo:\\
 
-    Propón 3 pseudoinstrucciones para el lenguaje ensamblador y su traducción.\\
+    Propón 3 pseudoinstrucciones para el lenguaje ensamblador y su traducción.
 	
 	\begin{enumerate}
 		\item {
+		\textbf{blt} \$8, \$9, 4 se traduce a:\\ 
 		
+		\textbf{slt} \$1, \$8, \$9\\
+		\textbf{bne} \$1, \$0, 4\\
 		}
 		\item {
+		\textbf{abs} \$1, \$2 se traduce a:\\
 		
+		\textbf{addu} \$1, \$2, \$0\\
+		\textbf{bgez} \$2, 8 (offset=8 $\rightarrow$ operación'sub')\\
+		\textbf{sub} \$1, \$2, \$0\\
 		}
 		\item {
+		\textbf{li} \$8, 0x3BF20 se traduce a:\\
 		
+		\textbf{lui} \$at, 0x0003\\
+		\textbf{ori} \$8, \$at, 0xBF20
 		}
 	\end{enumerate}
 	}
@@ -254,6 +266,10 @@
 	\url{https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00087-2B-MIPS64BIS-AFP-6.06.pdf}.
 	[Consultado: 13-Junio-2019].
 
+	\bibitem{instru}
+	\textit{MIPS Assembly/Pseudoinstructions [Online]}. Disponible:
+	\url{https://en.wikibooks.org/wiki/MIPS_Assembly/Pseudoinstructions}.
+	[Consultado: 13-Junio-2019].
 
 \end{thebibliography}
 

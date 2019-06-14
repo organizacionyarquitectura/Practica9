@@ -685,10 +685,21 @@ par busca_etiqueta(char *str) {
 
 void to_bin(int n, char buf[]) {
 	int i = strlen(buf)-1;
+	int c = (n < 0);
 	for(i; i >= 0; i --) {
 		int r = n % 2;
 		n /= 2;
 		buf[i] = '0'+r;
+	}
+	if(c) {
+		int i = strlen(buf)-1;
+		for(i; i >= 0; i --) {
+			if(buf[i] == '1') break;
+		}
+		for(i; i >= 0; i --) {
+			if(buf[i] == '1') buf[i] = '0';
+			else buf[i] = '1';
+		}
 	}
 	printf("%s\n", buf);
 }
@@ -810,7 +821,7 @@ char* codifica_inst_reg(char *str) {
 }
 
 nodo asm_reg(nodo nop) {
-	char linea[100] = "00000";
+	char linea[100] = "000000";
 	if(nop == NULL) {
 		printf("operación con registros vacía\n");
 		return NULL;

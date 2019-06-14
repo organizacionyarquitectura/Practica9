@@ -7,6 +7,8 @@ int delta[40][150];
 
 int base = 5000000;
 
+int linea = 0;
+
 lista etiquetas;
 lista lexemas;
 
@@ -796,6 +798,7 @@ nodo asm_imm(nodo nop) {
 	char *imm = codifica_imm(pimm->cadena);
 	strcat(linea, imm);
 	
+	strcat(linea, "\n");
 	strcat(o, linea);
 	return nimm;
 }
@@ -878,6 +881,8 @@ nodo asm_reg(nodo nop) {
 	strcat(linea, rd);
 
 	strcat(linea, op);
+
+	strcat(linea, "\n");
 	
 	strcat(o, linea);
 	return nrd;
@@ -994,5 +999,5 @@ int main(int argc, char** argv){
 
 	if(procesa_inst() == -1) return -1;
 	
-	printf("código final: \n %s\n", o);
+	printf("código final: \n%s\n", o);
 }

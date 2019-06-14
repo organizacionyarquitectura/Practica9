@@ -1089,6 +1089,7 @@ nodo asm_inst(nodo i) {
 	return r;
 }
 
+// No hace nada realmente. Sólo marca error.
 nodo procesa_data(nodo i) {
 	par ip = (par) (i -> elemento);
 	if((ip->valor) != 5 || strcmp(".data", ip->cadena)) {

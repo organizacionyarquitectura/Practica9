@@ -228,14 +228,19 @@
 	%2
 	\item {
 	Sólo se implementaron dos modos de direccionamiento, propón cómo podría
-	simular el ensamblador los siguientes modos \\
-
+	simular el ensamblador los siguientes modos
 	\begin{itemize}
 		\item {
-			label $\pm$ imm
+			label $\pm$ imm \\
+			Se puede traducir como una instrucción tipo I, donde la fuente es 
+			$\$00$ y el inmediato es
+			\[(linea\_actual - linea\_label) \pm imm\]
 		}
 		\item {
-			label $\pm$ imm(reg)
+			label $\pm$ imm(reg) \\
+			Se puede traducir como una instrucción tipo I, donde la fuente es 
+			reg y el inmediato es
+			\[(linea\_actual - linea\_label) \pm imm\]
 		}
 	\end{itemize}
 

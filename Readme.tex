@@ -1,0 +1,255 @@
+
+% tipo de documento
+\documentclass{article}
+
+% formato de página
+\usepackage[margin=1.5cm, letterpaper]{geometry}
+
+% idioma de los macros
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+% vínculos
+\usepackage{hyperref}
+
+% manejo de ecuaciones
+\usepackage{amsmath}
+
+% manejo de figuras
+\usepackage{graphicx}
+\usepackage{float}
+
+% texto del documento
+\begin{document}
+    \title{
+        Organización y Arquitectura de Computadoras \\
+        Práctica 9: Ensamblador \\
+    }
+    \date{
+        13 de junio del 2019
+    }
+    \author{
+        Sandra del Mar Soto Corderi \\
+        Edgar Quiroz Castañeda
+    }
+    \maketitle
+	\section{Ejercicios}
+	\begin{enumerate}
+
+		%1
+		\item {
+			Clasifica las instrucciones de la sección 4.2 según los tipos descritos en 4.3.
+
+			\begin{enumerate}
+				\item{ \textbf{lw} rs dir\\
+					Es de tipo \textbf{I}  \\
+				}
+
+        		\item{ \textbf{lh} rs dir\\
+        			Es de tipo \textbf{I}  \\
+				}
+
+				\item{ \textbf{lb} rs dir\\
+					Es de tipo \textbf{I}  \\
+				}
+
+				\item{ \textbf{sw} rs dir\\
+					Es de tipo \textbf{I}  \\
+			  	}
+
+				\item{ \textbf{sh} rs dir\\
+					Es de tipo \textbf{I}\\
+				}
+
+				\item{ \textbf{sb} rs dir\\
+					Es de tipo \textbf{I} \\
+				}
+
+				\item{ \textbf{add} rd rs rt\\
+					Es de tipo \textbf{R}\\
+				}
+
+				\item{ \textbf{addi} rd rs imm\\
+					Es de tipo \textbf{I}\\
+				}
+
+				\item{ \textbf{sub} rd rs rt\\
+					Es de tipo \textbf{R} \\
+				}
+
+				\item{ \textbf{subi} rd rs imm\\
+					Es de tipo \textbf{I} \\
+			  	}
+
+				\item{ \textbf{and} rd rs rt\\
+					Es de tipo \textbf{R}\\ 
+			  	}
+
+				\item{ \textbf{andi} rd rs imm\\
+					Es de tipo \textbf{I}\\
+				}
+
+				\item{ \textbf{or} rd rs rt\\
+					Es de tipo \textbf{R} 
+				}
+
+				\item{ \textbf{ori} rd rs imm\\
+					Es de tipo \textbf{I}\\
+				}
+
+				\item{ \textbf{beq} rs rt label\\
+			  		Es de tipo \textbf{I} \\
+		  		}
+
+				\item{ \textbf{bgt} rs rt label\\
+					Es de tipo \textbf{I} 
+			  	}
+        
+				\item{ \textbf{j} label\\
+					Es de tipo \textbf{J}\\ 
+				}
+
+				\item{ \textbf{jr} rd\\
+					Es de tipo \textbf{J} 
+				}
+
+			\end{enumerate}
+		}
+
+		%2
+		\item {
+			Asigna cuidadosamente los códigos de operación a cada una de las instrucciones. \\
+			
+			Los siguientes códigos de operación son todos extraídos de la fuente \cite{manual}
+			\begin{enumerate}
+			\item{ \textbf{lw} rs dir\\
+				Su código de operación es 100011  \\
+			}
+			
+			\item{ \textbf{lh} rs dir\\
+				Su código de operación es 100001 \\
+			}
+			
+			\item{ \textbf{lb} rs dir\\
+				Su código de operación es 100000  \\
+			}
+			
+			\item{ \textbf{sw} rs dir\\
+				Su código de operación es 101011  \\
+			}
+			
+			\item{ \textbf{sh} rs dir\\
+				Su código de operación es 101001\\
+			}
+			
+			\item{ \textbf{sb} rs dir\\
+				Su código de operación es 101000\\
+			}
+			
+			\item{ \textbf{add} rd rs rt\\
+				Su código de operación es 100000\\
+			}
+			
+			\item{ \textbf{addi} rd rs imm\\
+				Su código de operación es 001000\\
+			}
+			
+			\item{ \textbf{sub} rd rs rt\\
+				Su código de operación es 100010 \\
+			}
+			
+			\item{ \textbf{subi} rd rs imm\\
+				Su código de operación es 100011 \\
+			}
+			
+			\item{ \textbf{and} rd rs rt\\
+				Su código de operación es 100100\\ 
+			}
+			
+			\item{ \textbf{andi} rd rs imm\\
+				Su código de operación es 001100\\
+			}
+			
+			\item{ \textbf{or} rd rs rt\\
+				Su código de operación es 100101\\
+			}
+			
+			\item{ \textbf{ori} rd rs imm\\
+				Su código de operación es 001101\\
+			}
+			
+			\item{ \textbf{beq} rs rt label\\
+				Su código de operación es 000100 \\
+			}
+			
+			\item{ \textbf{bgt} rs rt label\\
+				Su código de operación es 000111\\
+			}
+			
+			\item{ \textbf{j} label\\
+				Su código de operación es 000010\\ 
+			}
+			
+			\item{ \textbf{jr} rd\\
+				Su código de operación es 001000
+			}
+		\end{enumerate}
+		}
+		%3
+		\item {
+			Define el tamaño de la memoria y las direcciones de inicio de las secciones de memoria para el área de texto y el área de datos.\\
+			
+			De acuerdo a la documentación de MIPS, los procesadores modernos compatibles con x86 son capaces de direccionar hasta $2^{32}$ bytes de memoria: las direcciones de memoria son de 32 bits de ancho
+		}
+	\end{enumerate}
+
+    \section{Preguntas}
+    \begin{enumerate}
+
+    %1
+    \item {
+    Una pseudoinstrucción es una instrucción de lenguaje ensamblador sin implementación directa en el hardware, su función es simplificar la programación sin complicar el hardware, por ejemplo:\\
+
+    Propón 3 pseudoinstrucciones para el lenguaje ensamblador y su traducción.\\
+	
+	\begin{enumerate}
+		\item {
+		
+		}
+		\item {
+		
+		}
+		\item {
+		
+		}
+	\end{enumerate}
+	}
+
+	%2
+	\item {
+	Sólo se implementaron dos modos de direccionamiento, propón cómo podría
+	simular el ensamblador los siguientes modos \\
+
+	\begin{itemize}
+		\item {
+			label $\pm$ imm
+		}
+		\item {
+			label $\pm$ imm(reg)
+		}
+	\end{itemize}
+
+	}
+
+    \end{enumerate}
+
+ \begin{thebibliography}{1}
+	\bibitem{manual}
+	\textit{MIPS® Architecture For Programmers Volume II-A: The MIPS64® Instruction Set Reference Manual [Online]}. Disponible:
+	\url{https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00087-2B-MIPS64BIS-AFP-6.06.pdf}.
+	[Consultado: 13-Junio-2019].
+
+
+\end{thebibliography}
+
+\end{document}

@@ -797,6 +797,18 @@ nodo asm_jump(nodo nop) {
 	return NULL;
 }
 
+char* codifica_inst_reg(char *str) {
+	char *buf = "";
+	if(!strcmp(str, "add")) buf = "00000000001";
+	else if(!strcmp(str, "sub")) buf = "00000000010";
+	else if(!strcmp(str, "and")) buf = "00000000011";
+	else if(!strcmp(str, "or")) buf = "00000000100";
+	else return NULL;
+	char *c = malloc(sizeof(char)*11);
+	strcpy(c, buf);
+	return c;
+}
+
 nodo asm_reg(nodo nop) {
 	char linea[100] = "00000";
 	if(nop == NULL) {

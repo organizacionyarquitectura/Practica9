@@ -1,3 +1,3 @@
 .data
 .text
-addi $01 $00 1
+add $01 $00 $02

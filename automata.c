@@ -811,6 +811,10 @@ nodo asm_jump(nodo nop) {
 	return NULL;
 }
 
+nodo asm_jump_c(nodo nop) {
+	return NULL;
+}
+
 char* codifica_inst_reg(char *str) {
 	char *buf = "";
 	if(!strcmp(str, "add")) buf = "00000000001";
@@ -898,11 +902,14 @@ nodo asm_inst(nodo i) {
 	} else if(cod[0] == 's' || cod[0] == 'l'){
 		printf("operador inmediato implícito encontrado\n");
 		r = asm_ls(i);
-	} else if(cod[0] == 'b' || cod[0] == 'j'){
+	} else if(cod[0] == 'j'){
 		printf("operador de salto encontrado\n");
 		r = asm_jump(i);
 	}
-	else {
+	else if(cod[0] == 'b'){
+		printf("operador de salto condicional encontrado\n");
+		r = asm_jump_c(i);
+	} else {
 		printf("operador de registros encontrado\n");
 		r = asm_reg(i);
 	};

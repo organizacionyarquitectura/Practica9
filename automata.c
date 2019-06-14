@@ -7,7 +7,7 @@ int delta[40][150];
 
 int base = 5000000;
 
-int linea = 0;
+int linea = 5000000;
 
 lista etiquetas;
 lista lexemas;
@@ -678,7 +678,7 @@ par busca_etiqueta(char *str) {
 	nodo i = etiquetas -> cabeza;
 	while(i != NULL) {
 		par ip = (par)(i->elemento);
-		if (ip->cadena == str) return ip;
+		if (!strcmp(ip->cadena, str)) return ip;
 		i = i->siguiente;
 	}
 	printf("etiqueta %s no econtrada\n", str);
@@ -688,6 +688,8 @@ par busca_etiqueta(char *str) {
 void to_bin(int n, char buf[]) {
 	int i = strlen(buf)-1;
 	int c = (n < 0);
+	n = abs(n);
+	printf("to_bin: %d\n", n);
 	for(i; i >= 0; i --) {
 		int r = n % 2;
 		n /= 2;
@@ -698,12 +700,13 @@ void to_bin(int n, char buf[]) {
 		for(i; i >= 0; i --) {
 			if(buf[i] == '1') break;
 		}
+		i--;
 		for(i; i >= 0; i --) {
 			if(buf[i] == '1') buf[i] = '0';
 			else buf[i] = '1';
 		}
 	}
-	printf("%s\n", buf);
+	printf("to_bin: %s\n", buf);
 }
 
 char* codifica_inst_imm(char *str) {
@@ -924,7 +927,65 @@ nodo asm_jump(nodo nop) {
 }
 
 nodo asm_jump_c(nodo nop) {
-	return NULL;
+	char linea[100] = "";
+	if(nop == NULL) {
+		printf("operación inmediata vacía\n");
+		return NULL;
+	}
+	par por = (par) (nop -> elemento);
+	if(por -> valor != 2) {
+		printf("primer término no es una operación\n");
+		return NULL;
+	}
+	char *op = codifica_inst_imm(por->cadena);
+	if(op == NULL) {
+		printf("operador inmediato inválido\n");
+		return NULL;
+	}
+	strcat(linea, op);
+
+	nodo nrs = nop -> siguiente;
+	if(nrs == NULL) {
+		printf("primer operando de inmediata vacía\n");
+		return NULL;
+	}
+	par prs = (par) (nrs -> elemento);
+	if(prs -> valor != 7) {
+		printf("primer operando de inmediata no es registro\n");
+		return NULL;
+	}
+	char *rs = codifica_reg(prs->cadena);
+	strcat(linea, rs);
+
+	nodo nrd = nrs -> siguiente;
+	if(nrd == NULL) {
+		printf("segundo operando de inmediata vacía\n");
+		return NULL;
+	}
+	par prd = (par) (nrd -> elemento);
+	if(prd -> valor != 7) {
+		printf("segundo operando de inmediata no es registro\n");
+		return NULL;
+	}
+	char *rd = codifica_reg(prd->cadena);
+	strcat(linea, rd);
+
+	nodo nimm = nrd -> siguiente;
+	if(nimm == NULL) {
+		printf("inmediato de inmediata vacío\n");
+		return NULL;
+	}
+	par pimm = (par) (nimm -> elemento);
+	if(pimm -> valor != 1) {
+		printf("tercer operando de inmediata no es etiqueta\n");
+		return NULL;
+	}
+	char *imm = codifica_etiqueta(pimm->cadena);
+	strcat(linea, imm);
+	
+	strcat(linea, "\n");
+	strcat(o, linea);
+	return nimm;
 }
 
 char* codifica_inst_reg(char *str) {
@@ -1036,6 +1097,7 @@ nodo procesa_data(nodo i) {
 	}
 	i = i->siguiente;
 	while(i != NULL) {
+		linea++;
 		par ip = (par) (i -> elemento);
 		switch (ip->valor) {
 		case 5:
@@ -1044,6 +1106,7 @@ nodo procesa_data(nodo i) {
 			i = asm_data_tag(i);
 			break;
 		default:
+			printf("data: %s %d\n", ip -> cadena, ip-> valor);
 			printf("data: inicio inválido de línea\n");
 			return NULL;
 		}
@@ -1066,6 +1129,7 @@ int procesa_text(nodo i) {
 	}
 	i = i->siguiente;
 	while(i != NULL) {
+		linea++;
 		par ip = (par) (i -> elemento);
 		switch (ip -> valor) {
 		case 6:
